@@ -114,7 +114,7 @@ fun Counter(count: Int, updateCount: (Int) -> Unit) {
     }
 }
 
-@Preview("MyScreen preview")
+@Preview("MyScreen preview", showBackground = true)
 @Composable
 fun DefaultPreview() {
     MyApp {

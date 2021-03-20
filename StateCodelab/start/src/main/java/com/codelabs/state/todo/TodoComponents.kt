@@ -27,34 +27,21 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayout
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSizeConstraints
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
-import androidx.compose.material.TextField
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -83,7 +70,7 @@ fun AnimatedIconRow(
     // this is required since TweenSpec restarts on interruption
     val enter = remember { fadeIn(animationSpec = TweenSpec(300, easing = FastOutLinearInEasing)) }
     val exit = remember { fadeOut(animationSpec = TweenSpec(100, easing = FastOutSlowInEasing)) }
-    Box(modifier.defaultMinSizeConstraints(minHeight = 16.dp)) {
+    Box(modifier.defaultMinSize(minHeight = 16.dp)) {
         AnimatedVisibility(
             visible = visible,
             initiallyVisible = initialVisibility,
@@ -128,7 +115,6 @@ fun IconRow(
  * @param isSelected (state) selection state
  * @param modifier modifier for this element
  */
-@OptIn(ExperimentalLayout::class)
 @Composable
 private fun SelectableIconButton(
     icon: ImageVector,
@@ -157,12 +143,12 @@ private fun SelectableIconButton(
                 Box(
                     Modifier
                         .padding(top = 3.dp)
-                        .preferredWidth(icon.defaultWidth)
-                        .preferredHeight(1.dp)
+                        .width(icon.defaultWidth)
+                        .height(1.dp)
                         .background(tint)
                 )
             } else {
-                Spacer(modifier = Modifier.preferredHeight(4.dp))
+                Spacer(modifier = Modifier.height(4.dp))
             }
         }
     }
@@ -203,6 +189,7 @@ fun TodoItemInputBackground(
  * @param modifier the modifier for this element
  * @param onImeAction (event) notify caller of [ImeAction.Done] events
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun TodoInputText(
     text: String,
@@ -210,17 +197,16 @@ fun TodoInputText(
     modifier: Modifier = Modifier,
     onImeAction: () -> Unit = {}
 ) {
-    lateinit var softwareKeyboardController: SoftwareKeyboardController
+    val softwareKeyboardController = LocalSoftwareKeyboardController.current
     TextField(
         value = text,
         onValueChange = onTextChange,
-        backgroundColor = Color.Transparent,
+        colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent),
         maxLines = 1,
-        onTextInputStarted = { softwareKeyboardController = it },
         keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
         keyboardActions = KeyboardActions(onDone = {
             onImeAction()
-            softwareKeyboardController.hideSoftwareKeyboard()
+            softwareKeyboardController?.hideSoftwareKeyboard()
         }),
         modifier = modifier
     )
